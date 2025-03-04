@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        h2,h4{
+            text-align: center;
+        }
+        h2{
+            padding: 5px;
+        }
+        #expense-form{
+            background-color: rgb(210, 225, 241);
+            padding:20px;
+            align-items: center;
+            width:max-content;
+            border-radius: 5px;
+            margin: auto;
+        }
+        label{
+            padding: 10px;
+            font-size: medium;
+            font-weight: bold;
+        }
+        input,select{
+            margin: 2px;
+            border-radius: 4px;
+            outline: none;
+        }
+        button{
+            background-color: rgb(12, 12, 201);
+            color: white;
+            cursor: pointer;
+            height: 50%;
+            height: 25px;
+            border: none;
+            border-radius: 4px;
+            margin:10px;
+            justify-content: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f86844;
+            color: white;
+        }
+
+        td {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="expense-form">
+        <h2>Expense Tracker</h2>
+        <div id="container"> 
+            <label for="category">Category: </label>
+            <select name="category" id="category">
+                <option value="entertainment">Entertainment</option>
+                <option value="transport">Transportation</option>
+                <option value="emi">EMI and Rent</option>
+                <option value="food">Food and Health</option>
+                <option value="others">Others</option>
+            </select><br/>
+        </div>
+    <div id="container">
+        <label for="amount">Amount($): </label>
+        <input type="number" id="amount" name="amount"/><br/>
+    </div>
+    <div id="container">
+        <label for="calender">Date: </label>
+        <input type="date" id="calender"/><br/>
+    </div>
+    <button id="btn-submit" onclick="addExpense()">Add Expenses</button>
+    </div>
+    <h2 id="total-expense">Total Expenses: </h2>
+    <div id="table-container">
+        <h4>Expense list:</h4>
+        <table>
+            <thead>
+                 <tr>
+                     <th>Category</th>
+                     <th>Date</th>
+                     <th>Amount</th>
+                     <th>Update</th>
+                     <th>Delete</th>
+                 </tr>
+            </thead>
+            <tbody id="expense-history">
+            </tbody>
+         </table>
+    </div>
+    <script>
+        var table = document.getElementById("expense-history");
+        function reset(){
+            document.getElementById('category').value='';
+            document.getElementById('amount').value='';
+            document.getElementById('calender').value='';
+        }
+        function addExpense(){
+            var category=document.getElementById('category').value;
+            var amount=parseFloat(document.getElementById('amount').value);
+            var date=document.getElementById('calender').value;
+            if(category ===''|| amount <= 0||date ===''){
+                alert('Please enter a valid expense description and amount.');
+                return;
+            }
+            console.log("function called...");
+            console.log(category+" "+amount+" "+date);
+            addToList(category,amount,date);
+            reset();
+            calculateTotalExpenses();
+        }
+        function addToList(category,amount,date){
+            var newRowHTML = document.createElement('tr');
+            newRowHTML.innerHTML = `<td>${category}</td>
+                                 <td>${date}</td>
+                                 <td>${amount.toFixed(2)}</td>
+                                 <td><button style="background-color: green;" class=\"edit-btn\">Edit</button></td>
+                                 <td><button style="background-color: green;" class=\"del-btn\">Delete</button></td>`;
+            table.appendChild(newRowHTML);
+        }
+        table.addEventListener("click", function(event) {
+            var row = event.target.closest("tr");
+
+            if (event.target.classList.contains("del-btn")) {
+                row.remove();
+            }
+
+            if (event.target.classList.contains("edit-btn")) {
+                var cells = row.getElementsByTagName("td");
+
+                // Get current values and fill input fields
+                document.getElementById("category").value = cells[0].textContent;
+                document.getElementById("amount").value = parseFloat(cells[2].textContent);
+                document.getElementById("calender").value = cells[1].textContent;
+
+                // Update row on submit
+                document.getElementById("btn-submit").onclick = function () {
+                    cells[0].textContent = document.getElementById("category").value;
+                    cells[1].textContent = document.getElementById("calender").value;
+                    cells[2].textContent = parseFloat(document.getElementById("amount").value).toFixed(2);
+                    reset();
+                    calculateTotalExpenses();
+                };
+            }
+        });
+        function calculateTotalExpenses() {
+            let table = document.getElementById("expense-history"); // Get the table
+            let rows = table.getElementsByTagName("tr"); // Get all table rows
+            let total = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length > 2) { 
+                    let amount = parseFloat(cells[2].textContent); 
+                    if (!isNaN(amount)) { 
+                        total += amount; 
+                    }
+                }
+            }
+
+            document.getElementById("total-expense").textContent = `Total Expenses: ₹${total.toFixed(2)}`;
+        }
+
+    </script>
+</body>
+</html>
