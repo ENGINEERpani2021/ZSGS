@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="ToDo.css">
+    <script src="toDo.js" defer></script>
+</head>
+<body>
+    <div id="container">
+        <div id="todoApp">
+            <h2>To-Do List</h2>
+            <div id="input-container">
+                <label for="category">Category:</label>
+                <select id="category">
+                    <option value="work">Work</option>
+                    <option value="routine">Routine</option>
+                    <option value="personal">Personal</option>
+                </select>
+                <input type="text" id="text-box" placeholder="Add your task">
+                <button onclick="addTask()">Add</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="filters">
+                <button class="category-button" onclick="setCurrentTab('All')" id="all">All</button>
+                <button class="category-button" onclick="setCurrentTab('work')" id="work">Work</button>
+                <button class="category-button" onclick="setCurrentTab('routine')" id="routine">Routine</button>
+                <button class="category-button" onclick="setCurrentTab('personal')" id="personal">Personal</button>
+            </div>
+            <ul class="task-box"></ul>
+        </div>
+    </div>
+</body>
+</html>
