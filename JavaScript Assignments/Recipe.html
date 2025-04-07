@@ -1,0 +1,215 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+    <link rel="stylesheet" href="Recipe.css">
+</head>
+<body>
+    <div class = "nav-tab">
+        <h2>Find the recipes for your ingredients!</h2>
+    </div>
+    <div class="search-container">
+        <input type="text" id="search_input" class="search-tab" placeholder="Search for the recipe" />
+        <button type="button" id="button" class="btn">Search</button>
+    </div>
+    <div class="items" id="items"></div>
+</body>
+<script src="Recipe.js"></script>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DelishDishes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #673ab7;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #main {
+      padding: 20px;
+    }
+
+    .meal-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .meal-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 260px;
+      overflow: hidden;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+
+    .meal-card:hover {
+      transform: scale(1.05);
+    }
+
+    .meal-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .meal-card h3 {
+      text-align: center;
+      padding: 10px;
+      font-size: 1.2rem;
+    }
+
+    .meal-details {
+      max-width: 800px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .meal-details h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .info-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .info-grid img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .ingredients-list, .instruction-list {
+      margin-top: 20px;
+    }
+
+    .ingredients-list li, .instruction-list li {
+      padding: 6px 0;
+    }
+
+    .back-button {
+      background-color: #673ab7;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .youtube-link {
+      display: inline-block;
+      margin-top: 10px;
+      background-color: #d32f2f;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DelishDishes</h1>
+    <p>Explore your next favorite meal!</p>
+  </header>
+  <div id="main">
+    <div id="loader">Loading...</div>
+    <div id="meals" class="meal-grid"></div>
+    <div id="details" class="meal-details" style="display:none;"></div>
+  </div>
+  <script>
+    let mealsData = [];
+
+    async function fetchMeals() {
+      const res = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
+      const data = await res.json();
+      mealsData = data.meals || [];
+      displayMeals();
+    }
+
+    function displayMeals() {
+      document.getElementById('loader').style.display = 'none';
+      const mealsContainer = document.getElementById('meals');
+      mealsData.forEach(meal => {
+        const mealCard = document.createElement('div');
+        mealCard.className = 'meal-card';
+        mealCard.innerHTML = `
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
+          <h3>${meal.strMeal}</h3>
+        `;
+        mealCard.onclick = () => showDetails(meal);
+        mealsContainer.appendChild(mealCard);
+      });
+    }
+
+    function showDetails(meal) {
+      document.getElementById('meals').style.display = 'none';
+      const details = document.getElementById('details');
+      let ingredientsHTML = '';
+      for (let i = 1; i <= 20; i++) {
+        let ingredient = meal[`strIngredient${i}`];
+        let measure = meal[`strMeasure${i}`];
+        if (ingredient && ingredient.trim()) {
+          ingredientsHTML += `<li>${ingredient} - ${measure}</li>`;
+        }
+      }
+      const instructions = meal.strInstructions.split('. ').map(p => `<li>${p.trim()}.</li>`).join('');
+
+      details.innerHTML = `
+        <button class="back-button" onclick="goBack()">Back</button>
+        <h2>${meal.strMeal}</h2>
+        <div class="info-grid">
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
+          <div>
+            <p><strong>Category:</strong> ${meal.strCategory}</p>
+            <p><strong>Area:</strong> ${meal.strArea}</p>
+            <p><strong>Tags:</strong> ${meal.strTags || 'N/A'}</p>
+            <a href="${meal.strYoutube}" class="youtube-link" target="_blank">Watch on YouTube</a>
+          </div>
+        </div>
+        <h3>Ingredients:</h3>
+        <ul class="ingredients-list">${ingredientsHTML}</ul>
+        <h3>Instructions:</h3>
+        <ol class="instruction-list">${instructions}</ol>
+      `;
+      details.style.display = 'block';
+    }
+
+    function goBack() {
+      document.getElementById('details').style.display = 'none';
+      document.getElementById('meals').style.display = 'flex';
+    }
+
+    fetchMeals();
+  </script>
+</body>
+</html>
